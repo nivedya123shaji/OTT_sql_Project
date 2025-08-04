@@ -1,6 +1,7 @@
 # OTT_sql_Project showing Movies and TV Shows for Data Analysis using SQL
 
 [OTT Platform](https://github.com/nivedya123shaji/OTT_sql_Project/blob/main/OTT_Logo.png)
+
 ##objective
 
 This project involves a comprehensive analysis of Netflix's movies and TV shows data using SQL. The goal is to extract valuable insights and answer various business questions based on the dataset. The following README provides a detailed account of the project's objectives, business problems, solutions, findings, and conclusions.
@@ -14,7 +15,10 @@ Dataset
 The data for this project is sourced from the Kaggle dataset:
 
 [Dataset Link]: Movies Dataset
-Schema
+
+###Schema
+
+***sql
 DROP TABLE IF EXISTS netflix;
 CREATE TABLE netflix
 (
@@ -31,14 +35,20 @@ CREATE TABLE netflix
     listed_in    VARCHAR(250),
     description  VARCHAR(550)
 );
-Business Problems and Solutions
-1. Count the Number of Movies vs TV Shows
+***
+
+##Business Problems and Solutions
+
+###1. Count the Number of Movies vs TV Shows
+***sql
 SELECT 
     type,
     COUNT(*)
 FROM netflix
 GROUP BY 1;
-Objective: Determine the distribution of content types on Netflix.
+***
+##Objective: Determine the distribution of content types on Netflix.
+
 
 2. Find the Most Common Rating for Movies and TV Shows
 WITH RatingCounts AS (
