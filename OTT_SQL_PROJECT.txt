@@ -1,0 +1,164 @@
+--OTT_SQL_PROJECT
+--MoviesSerial 
+
+Drop table if exists OttPlatform;
+
+Create table OttPlatform(
+show_id	varchar(10),
+type varchar(10),
+title	varchar(150),
+director varchar(230),	
+casts varchar(1000),
+country	varchar(154),
+date_added varchar(60),
+release_year	int,
+rating	varchar(15),
+duration varchar(20),	
+listed_in varchar(150),
+description varchar(250)
+);
+--View the Table
+Select * from OttPlatform;
+
+--Counting how many rows are Present
+select count(*) from OttPlatform;
+
+--Distint type of Movie
+Select distinct type from OttPlatform;
+
+--Count the Number of Movies vs TV Shows
+Select type,count(*) from OttPlatform group by 1;
+
+-- Find the Most Common Rating for Movies and TV Shows
+WITH RatingCounts AS (
+    SELECT 
+        type,
+        rating,
+        COUNT(*) AS rating_count
+    FROM OttPlatform
+    GROUP BY type, rating
+),
+RankedRatings AS (
+    SELECT 
+        type,
+        rating,
+        rating_count,
+        RANK() OVER (PARTITION BY type ORDER BY rating_count DESC) AS rank
+    FROM RatingCounts
+)
+select type,rating,rating_count from RankedRatings where rank=1; 
+
+--List All Movies Released in a Specific Year (e.g., 2020)
+Select title,type,release_year
+from OttPlatform
+where type='Movie' and release_year=2020;
+
+--Find the Top 5 Countries with the Most Content on OTTPlatform
+SELECT 
+        UNNEST(STRING_TO_ARRAY(country, ',')) AS country,
+        COUNT(*) AS total_content
+    FROM OttPlatform
+    GROUP BY 1 order by total_content desc limit 5;
+
+-- Identify the Longest Movie
+Select type,title,duration
+from OttPlatform
+where type='Movie'
+order by SPLIT_PART(duration,' ',1)::INT desc;
+
+-- Find Content Added in the Last 5 Years
+SELECT DISTINCT date_added FROM OttPlatform ORDER BY date_added;
+
+SELECT * from OttPlatform
+
+SELECT *
+FROM OttPlatform
+WHERE TO_DATE(date_added, 'Month DD,YYYY') >= CURRENT_DATE - INTERVAL '5 years';
+
+select date_added from OttPlatform
+
+--Find All Movies/TV Shows by Director 'Rajiv Chilaka'
+--This will show onnly only 19 records of that director the only director but when 
+--some other director working with him then that Records are not shown so the below query works for that
+Select type,title,director
+from OttPlatform
+where director='Rajiv Chilaka'
+
+SELECT *
+FROM (
+    SELECT 
+        *,
+        UNNEST(STRING_TO_ARRAY(director, ',')) AS director_name
+    FROM OttPlatform
+) AS t
+WHERE director_name = 'Rajiv Chilaka';
+
+
+select count(*) from OttPlatform where director = 'Rajiv Chilaka';
+
+--8. List All TV Shows with More Than 5 Seasons
+Select *
+from OttPlatform
+where type='TV Show' and Split_part(duration,' ',1)::INT>5;
+
+--9. Count the Number of Content Items in Each Genre
+SELECT 
+    UNNEST(STRING_TO_ARRAY(listed_in, ',')) AS genre,
+    COUNT(*) AS total_content
+FROM OttPlatform
+GROUP BY 1;
+
+--10.Find each year and the average numbers of content release in India on OttPlatform
+SELECT 
+    country,
+    release_year,
+    COUNT(show_id) AS total_release,
+    ROUND(
+        COUNT(show_id)::numeric /
+        (SELECT COUNT(show_id) FROM OttPlatform WHERE country = 'India')::numeric * 100, 2
+    ) AS avg_release
+FROM OttPlatform
+WHERE country = 'India'
+GROUP BY country, release_year
+ORDER BY avg_release DESC
+LIMIT 5;
+
+--11. List All Movies that are Documentaries
+SELECT * 
+FROM OttPlatform
+WHERE listed_in LIKE '%Documentaries';
+
+--12. Find All Content Without a Director
+SELECT * 
+FROM OttPlatform
+WHERE director IS NULL;
+
+--13. Find How Many Movies Actor 'Salman Khan' Appeared in the Last 10 Years
+SELECT * 
+FROM OttPlatform
+WHERE casts LIKE '%Salman Khan%'
+  AND release_year > EXTRACT(YEAR FROM CURRENT_DATE) - 10;
+
+--14. Find the Top 10 Actors Who Have Appeared in the Highest Number of Movies Produced in India
+SELECT 
+    UNNEST(STRING_TO_ARRAY(casts, ',')) AS actor,
+    COUNT(*)
+FROM OttPlatform
+WHERE country = 'India'
+GROUP BY actor
+ORDER BY COUNT(*) DESC
+LIMIT 10;
+
+--15. Categorize Content Based on the Presence of 'Kill' and 'Violence' Keywords
+SELECT 
+    category,
+    COUNT(*) AS content_count
+FROM (
+    SELECT 
+        CASE 
+            WHEN description ILIKE '%kill%' OR description ILIKE '%violence%' THEN 'Bad'
+            ELSE 'Good'
+        END AS category
+    FROM OttPlatform
+) AS categorized_content
+GROUP BY category;
