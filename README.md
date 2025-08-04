@@ -1,3 +1,3 @@
 # OTT_sql_Project showing Movies and TV Shows for Data Analysis using SQL
 
-[OTT Platform](<a href="https://www.flaticon.com/free-icons/ott" title="ott icons">Ott icons created by Freepik - Flaticon</a>)
+[OTT Platform](https://github.com/nivedya123shaji/OTT_sql_Project/blob/main/OTT_Logo.png)
